@@ -28,9 +28,11 @@ console.log('3000 is listining port.');
 /**
  * Electron Code
  */
-const electron = require('electron')
+/*const electron = require('electron')
 var dialog = require('electron').dialog
 const ElectApp = electron.app
+console.log(ElectApp);
+return false;
 const BrowserWindow = electron.BrowserWindow
 global.Menu = electron.Menu
 const options = {
@@ -62,3 +64,4 @@ ElectApp.on('window-all-closed', function () {
     ElectApp.quit()
   }
 })
+*/
