@@ -1,0 +1,185 @@
+let fs = require('fs');
+let Schema = require('./vendor/artisan-migration/Schema');
+var squel = require("squel");
+Array.prototype.inArray = function (value){
+    var i;
+    for (i=0; i < this.length; i++){
+        if (this[i] == value){
+            return true;
+        }
+    }
+    return false;
+};
+
+let commands = [
+    'make:controller',
+    'make:model',
+    'make:migration',
+    'make:middleware',
+    'migrate'
+];
+
+if(!commands.inArray(process.argv[2])){
+    console.log(`
+            `+process.argv[2]+` command not found
+
+            Available Commands:
+
+            make:controller   To create new controller
+            make:model        To create new model
+            make:migration    To create new migration
+            make:middleware   To create new middleware
+        `);
+}else{
+    switch(process.argv[2]){
+        case'make:controller':
+            if(3 in process.argv){
+                createController(process.argv[3]);
+            }else{
+                noSubcommandFound();
+            }
+        break;
+
+        case'make:model':
+            if(3 in process.argv){
+                createModel(process.argv[3]);
+            }else{
+                noSubcommandFound();
+            }
+        break;
+
+        case'make:migration':
+            if(3 in process.argv){
+                createMigration(process.argv[3]);
+            }else{
+                noSubcommandFound();
+            }
+        break;
+
+        case'migrate':
+
+            Schema.create('users', (table)=>{
+                table.increments('id');
+                table.string('username');
+                table.date('reg_date');
+                table.dateTime('date_and_time');
+                table.double('text_double');
+                table.text('text');
+                table.longText('long_text');
+            });
+            // migrateMigrations();
+        break;
+    }
+}
+
+
+function noSubcommandFound(){
+    console.log('\x1b[31m%s\x1b[0m',`Error: No input found, please specify the command`)
+}
+
+function createMigration(migrationName){
+    var content = `
+    // Migration Content
+
+    `;
+    var file_name = Date.now();
+    file_name = file_name+'_'+migrationName;
+    if (!fs.existsSync("database/migrations/"+file_name+".js")){
+        fs.writeFile("database/migrations/"+file_name+".js", content, function(err) {
+            if(err) {
+                return console.log(err);
+            }
+
+            console.log('\x1b[32m%s\x1b[0m',file_name+` Migration created successfully!`);
+        });
+    }else{
+        console.log('\x1b[33m%s\x1b[0m',` 
+            Warning: [`+file_name+`] migration already exist!
+        `);
+    }
+}
+
+
+function createController(contollerName){
+
+    let controller = `
+/**
+ * `+contollerName+`
+ */
+class `+contollerName+`{
+
+    index(req,res){
+        res.send('This is `+contollerName+` contoller');
+    }
+}  
+module.exports = new `+contollerName+`();
+    `;
+    if (!fs.existsSync("app/Http/Controllers/"+contollerName+".js")){
+        fs.writeFile("app/Http/Controllers/"+contollerName+".js", controller, function(err) {
+            if(err) {
+                return console.log(err);
+            }
+
+            console.log('\x1b[32m%s\x1b[0m',` Controller created successfully!`);
+        });
+    }else{
+        console.log('\x1b[33m%s\x1b[0m',` 
+            Warning: [`+contollerName+`] Controller already exist!
+        `);
+    }
+}
+
+function createModel(modelName){
+    let model = `
+/**
+ * `+modelName+` Model
+ */
+class `+modelName+`{
+
+    //Model methods
+}  
+
+module.exports = new `+modelName+`();
+    `;
+    if (!fs.existsSync("app/"+modelName+".js")){
+        fs.writeFile("app/"+modelName+".js", model, function(err) {
+            if(err) {
+                return console.log(err);
+            }
+
+            console.log('\x1b[32m%s\x1b[0m',` Model created successfully!`);
+        });
+    }else{
+        console.log('\x1b[33m%s\x1b[0m',` 
+            Warning: [`+modelName+`] Model already exist!
+        `);
+    }
+}
+
+/*
+Reset = "\x1b[0m"
+Bright = "\x1b[1m"
+Dim = "\x1b[2m"
+Reverse = "\x1b[7m"
+Hidden = "\x1b[8m"
+Underscore = "\x1b[4m"
+Blink = "\x1b[5m"
+
+FgBlack = "\x1b[30m"
+FgRed = "\x1b[31m"
+FgGreen = "\x1b[32m"
+FgYellow = "\x1b[33m"
+FgBlue = "\x1b[34m"
+FgMagenta = "\x1b[35m"
+FgCyan = "\x1b[36m"
+FgWhite = "\x1b[37m"
+
+BgBlack = "\x1b[40m"
+BgRed = "\x1b[41m"
+BgGreen = "\x1b[42m"
+BgYellow = "\x1b[43m"
+BgBlue = "\x1b[44m"
+BgMagenta = "\x1b[45m"
+BgCyan = "\x1b[46m"
+BgWhite = "\x1b[47m"
+ */
